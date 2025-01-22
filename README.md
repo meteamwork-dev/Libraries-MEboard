@@ -10,6 +10,9 @@
 - การสื่อสาร modbus RTU RS485
 - EEPROM
 - ตัวอย่างการใช้งาน
+
+ช่องทางการติดต่อสอบถาม email ping.paradon2000@gmail.com
+
 ## อธิบายฟังก์ชันและการใช้งานของไลบราลี่ MEboard
 ติดตั้ง Arduino IDE version : 2.3.4 
 
@@ -67,7 +70,7 @@ EX1.1 ตัวอย่างการใช้งาน DI
 จากนั้น complied และ upload ไปยัง MEBoard จะดูค่า DI1 ได้ใน Serial Monitor 
 
 **Analoginput:**
-
+ 
 คือชุดคำสั่งเพื่อไว้อ่านค่า AI และ NTC ของ MEboard จะถูกวางใน void ReadSensor() เพื่ออ่านค่าต่อครั้งตามเวลาที่กำหนด โดยใช้ชุดคำสั่งดังนี้
 
                     ReadAI();              ---1.4
