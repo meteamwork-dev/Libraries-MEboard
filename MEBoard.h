@@ -1,8 +1,9 @@
 
 //ME Board Libraries 
-//Version 1.00
-//By Ping
-//Last Update 01/11/2024
+//Version 0.1.1
+//By Ping Tel.0946567779
+//email ping.paradon2000@gmail.com
+//Last Update 04/02/2024
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <SimpleTimer.h>
@@ -43,13 +44,17 @@ int NumAI1[NUMSAMPLES]; float FAI1; float AI1; //int AI1MAP;
 int NumAI2[NUMSAMPLES]; float FAI2; float AI2; //int AI2MAP;
 int NumAI3[NUMSAMPLES]; float FAI3; float AI3; //int AI3MAP;
 int NumAI4[NUMSAMPLES]; float FAI4; float AI4; //int AI4MAP;
-int AIPin; int Function;  int Min;  int Max; 
-int Function_min; int Function_max;
+int AIPin; int AImode; int Min;  int Max; 
+int AIpara1; float AIpara2; 
 
-int16_t AIMin1,AIMax1,AIMin2,AIMax2,AIMin3,AIMax3,AIMin4,AIMax4;// modbus AI
-int MapAIMin1,MAP1,MapAIMin2,MAP2,MapAIMin3,MAP3,MapAIMin4,MAP4;// 
+//int16_t AIMin1,AIMax1,AIMin2,AIMax2,AIMin3,AIMax3,AIMin4,AIMax4;// modbus AI
+//int MapAIMin1,MAP1,MapAIMin2,MAP2,MapAIMin3,MAP3,MapAIMin4,MAP4;// 
 
-int16_t calAI1,calAI2,calAI3,calAI4;
+int16_t calAI1=0;
+int16_t calAI2=0;
+int16_t calAI3=0;
+int16_t calAI4=0;
+int AI1C =0, AI2C=0, AI3C=0, AI4C=0; 
 //============AnalogOutput============
 int AOpin; int pwm; 
 uint16_t AO1;   uint16_t AO2;   uint16_t AO3;   uint16_t AO4;  // modbus AO
@@ -75,7 +80,6 @@ THERMISTOR thermistor6(NTC_PIN6, 10000, 3950, 10000);
 THERMISTOR thermistor7(NTC_PIN7, 10000, 3950, 10000);         
 THERMISTOR thermistor8(NTC_PIN8, 10000, 3950, 10000);             
 
-
 //============PID============
 double Setpoint1, Input1, Output1;
 double Setpoint2, Input2, Output2;
@@ -86,26 +90,21 @@ int PIDOutput1=0;
 int PIDOutput2=0;
 int PIDOutput3=0;
 int PIDOutput4=0;
-int kp1=0,ki1=0,kd1=0;
-int kp2=0,ki2=0,kd2=0;
-int kp3=0,ki3=0,kd3=0;
-int kp4=0,ki4=0,kd4=0;
-PID myPID1(&Input1, &Output1, &Setpoint1, kp1, 5, 1, REVERSE);//DIRECT
-PID myPID2(&Input2, &Output2, &Setpoint2, 10, 5, 1, REVERSE);//DIRECT
-PID myPID3(&Input3, &Output3, &Setpoint3, 10, 5, 1, REVERSE);//DIRECT
-PID myPID4(&Input4, &Output4, &Setpoint4, 10, 5, 1, REVERSE);//DIRECT
-
+int kp1,ki1,kd1;
+int kp2,ki2,kd2;
+int kp3,ki3,kd3;
+int kp4,ki4,kd4;
 
 //============Register PID============
 int16_t setpoint1,setpoint2,setpoint3,setpoint4;
 int16_t outMax1,outMin1,outMax2,outMin2,outMax3,outMin3,outMax4,outMin4;
-
 
 //============void PID para============
 int kp1_1=0,ki1_1=0,kd1_1=0;
 int kp2_1=0,ki2_1=0,kd2_1=0;
 int kp3_1=0,ki3_1=0,kd3_1=0;
 int kp4_1=0,ki4_1=0,kd4_1=0;
+int Direction1=0,Direction2=0,Direction3=0,Direction4=0;
 //=============Register============
 int16_t ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,ps9,ps10,ps11,ps12,ps13,ps14,ps15,ps16,ps17,ps18,ps19,ps20,ps21,ps22,ps23,ps24,ps25,ps26,ps27,ps28,ps29,ps30,ps31,ps32,ps33,ps34,ps35,ps36,ps37,ps38,ps39,ps40,ps41,ps42,ps43,ps44,ps45,ps46 ;
 
@@ -406,51 +405,31 @@ void DOut(int DOPin, int DOonoff){
     
 }
 
-int AI1C, AI2C, AI3C, AI4C; 
 
-void AISet(int AIPin, int Function,int Min, int Max ){
-     
-switch (Function) {
-  case 1:
-  Function_min=0; Function_max=1024; break; //0-5V
-  case 2:
-  Function_min=198; Function_max=973; break;//4-20mA
+void AISet(int AIPin, float AIpara1, float AIpara2, int Min, int Max, float CalAI ){
 
-}
-  switch (AIPin) {
+    switch (AIPin) {
     case 1:
-    AI1 = map(FAI1,Function_min,Function_max,Min,Max);
-   if(FAI1 > Function_max){FAI1 = Function_max;}
-   if(FAI1 < Function_min){FAI1 = Function_min;}
+    AI1 = ((FAI1 * AIpara1) + AIpara2)*CalAI;
    if (AI1 < Min) {AI1 = Min;}//1
    if (AI1 > Max) {AI1 = Max;}//450
     break;
     case 2:
-     AI2 = map(FAI2,Function_min,Function_max,Min,Max);
-   if(FAI2 > Function_max){FAI2 = Function_max;}
-   if(FAI2 < Function_min){FAI2 = Function_min;}
+     AI2 = ((FAI2 * AIpara1) + AIpara2)*CalAI; //((FAI2 * 0.5249) - 53.5)*CalAI;
    if (AI2 < Min) {AI2 = Min;}//1
    if (AI2 > Max) {AI2 = Max;}//450
    break;
     case 3:
-     AI3 = map(FAI3,Function_min,Function_max,Min,Max); //map(FAI3,Function_min,Function_max,Min,Max);
-   if(FAI3 > Function_max){FAI3 = Function_max;} //if(FAI3 > Function_max){FAI3 = Function_max;}
-   if(FAI3 < Function_min){FAI3 = Function_min;} //if(FAI3 < Function_min){FAI3 = Function_min;} 
+     AI3 = ((FAI3 * AIpara1) + AIpara2)*CalAI;
    if (AI3 < Min) {AI3 = Min;}//1
    if (AI3 > Max) {AI3 = Max;}//450
    break;
     case 4:
-     AI4 = map(FAI4,Function_min,Function_max,Min,Max);
-   if(FAI4 > Function_max){FAI4 = Function_max;}
-   if(FAI4 < Function_min){FAI4 = Function_min;}
+     AI4 = ((FAI4 * AIpara1) + AIpara2)*CalAI;  //((FAI4 * 0.5249) - 53.5)*CalAI;
    if (AI4 < Min) {AI4 = Min;}//1
    if (AI4 > Max) {AI4 = Max;}//450
    break;
   }
-  AI1C = AI1+(calAI1/10);
-  AI2C = AI2+(calAI2/10);
-  AI3C = AI3+(calAI3/10);
-  AI4C = AI4+(calAI4/10);
 }
 
 
@@ -716,94 +695,189 @@ void modbusread(){
 
 } 
 
-void PIDAOut1(int setpoint1_1,float Feedback1_1,int kp1_1,int ki1_1,int kd1_1,int outMin1_1,int outMax1_1){
+void PIDAOut1(int setpoint1_1,float Feedback1_1,int Direction1,int kp1_1,int ki1_1,int kd1_1,int outMin1_1,int outMax1_1){
   Input1 = Feedback1_1;      // Feedback
   Setpoint1 = setpoint1_1*0.1; // Set point 
-  myPID1.SetOutputLimits(outMin1_1, outMax1_1);
-  myPID1.SetMode(AUTOMATIC);  
-  myPID1.Compute();
+  kp1_1 = map(kp1_1,1,100,1,10);
+  ki1_1 = map(ki1_1,1,100,1,10);
+  kd1_1 = map(kd1_1,1,100,1,3);
   kp1 = kp1_1;
   ki1 = ki1_1;
   kd1 = kd1_1;
+
+  PID myPID1(&Input1, &Output1, &Setpoint1, kp1, ki1, kd1, DIRECT);//DIRECT 10, 5, 1, kp1, ki1, kd1,
+  PID myPID1R(&Input1, &Output1, &Setpoint1, kp1, ki1, kd1, REVERSE);
+  if(Direction1==0){//DIRECT
+  myPID1.SetOutputLimits(outMin1_1, outMax1_1);
+  myPID1.SetMode(AUTOMATIC);  
+  myPID1.Compute();
+  }
+
+  if(Direction1==1){//REVERSE
+  myPID1R.SetOutputLimits(outMin1_1, outMax1_1);
+  myPID1R.SetMode(AUTOMATIC);  
+  myPID1R.Compute();
+  }
+  
+
   PIDOutput1 = int(Output1);
   if (PIDOutput1<=outMin1_1){PIDOutput1=outMin1_1;}  // Set minimum
   if (PIDOutput1>=outMax1_1){PIDOutput1=outMax1_1;}  // Set maximum
   AOut(1,PIDOutput1);
-  Serial.print("Input1 ");
+
+  /*Serial.print("   Input1  ");
   Serial.print(Input1);
-  Serial.print("   Setpoint1 ");
+  Serial.print("   Setpoint1  ");
   Serial.print(Setpoint1);
-  Serial.print("  kp1 ");
+  Serial.print("   kp1  ");
   Serial.print(kp1);
-  Serial.print("  ki1 ");
+  Serial.print("   ki1  ");
   Serial.print(ki1);
-  Serial.print("  kd1 ");
+  Serial.print("   kd1  ");
   Serial.print(kd1);
+  Serial.print("   Output1  ");
+  Serial.print(Output1);
   Serial.print("   PIDOutput1 ");
-  Serial.println(PIDOutput1);
+  Serial.println(PIDOutput1);*/
 }
 
-void PIDAOut2(int setpoint2_1,float Feedback2_1,int kp2_1,int ki2_1,int kd2_1,int outMin2_1,int outMax2_1){
+void PIDAOut2(int setpoint2_1,float Feedback2_1,int Direction2,int kp2_1,int ki2_1,int kd2_1,int outMin2_1,int outMax2_1){
   Input2 = Feedback2_1;      // Feedback
   Setpoint2 = setpoint2_1*0.1; // Set point 
-  myPID2.SetOutputLimits(outMin2_1, outMax2_1);
-  myPID2.SetMode(AUTOMATIC);  
-  myPID2.Compute();
+  kp2_1 = map(kp2_1,1,100,1,10);
+  ki2_1 = map(ki2_1,1,100,1,10);
+  kd2_1 = map(kd2_1,1,100,1,3);
   kp2 = kp2_1;
   ki2 = ki2_1;
   kd2 = kd2_1;
+  
+  PID myPID2(&Input2, &Output2, &Setpoint2, kp2, ki2, kd2, DIRECT);//DIRECT  kp2, ki2, kd2
+  PID myPID2R(&Input2, &Output2, &Setpoint2, kp2, ki2, kd2, REVERSE);
+
+  if(Direction2==0){//DIRECT 
+  myPID2.SetOutputLimits(outMin2_1, outMax2_1);
+  myPID2.SetMode(AUTOMATIC);  
+  myPID2.Compute();
+  }
+  
+  if(Direction2==1){//REVERSE
+  myPID2R.SetOutputLimits(outMin2_1, outMax2_1);
+  myPID2R.SetMode(AUTOMATIC);  
+  myPID2R.Compute();
+  }
+
   PIDOutput2 = int(Output2);
   if (PIDOutput2<=outMin2_1){PIDOutput2=outMin2_1;}  // Set minimum
   if (PIDOutput2>=outMax2_1){PIDOutput2=outMax2_1;}  // Set maximum
   AOut(2,PIDOutput2);
-  Serial.print("Input2 ");
+
+  /*Serial.print("   Input2  ");
   Serial.print(Input2);
-  Serial.print("   Setpoint2 ");
+  Serial.print("   Setpoint2  ");
   Serial.print(Setpoint2);
+  Serial.print("   kp2  ");
+  Serial.print(kp2);
+  Serial.print("   ki2  ");
+  Serial.print(ki2);
+  Serial.print("   kd2  ");
+  Serial.print(kd2);
+  Serial.print("   Output2  ");
+  Serial.print(Output2);
   Serial.print("   PIDOutput2 ");
-  Serial.println(PIDOutput2);
+  Serial.println(PIDOutput2);*/
 }
 
-void PIDAOut3(int setpoint3_1,float Feedback3_1,int kp3_1,int ki3_1,int kd3_1,int outMin3_1,int outMax3_1){
+void PIDAOut3(int setpoint3_1,float Feedback3_1,int Direction3,int kp3_1,int ki3_1,int kd3_1,int outMin3_1,int outMax3_1){
   Input3 = Feedback3_1;      // Feedback
   Setpoint3 = setpoint3_1*0.1; // Set point 
-  myPID3.SetOutputLimits(outMin3_1, outMax3_1);
-  myPID3.SetMode(AUTOMATIC);  
-  myPID3.Compute();
+  kp3_1 = map(kp3_1,1,100,1,10);
+  ki3_1 = map(ki3_1,1,100,1,10);
+  kd3_1 = map(kd3_1,1,100,1,3);
   kp3 = kp3_1;
   ki3 = ki3_1;
   kd3 = kd3_1;
+  
+  
+  PID myPID3(&Input3, &Output3, &Setpoint3, kp3, ki3, kd3, DIRECT);//DIRECT REVERSE
+  PID myPID3R(&Input3, &Output3, &Setpoint3, kp3, ki3, kd3, REVERSE);
+
+  if(Direction3==0){//DIRECT 
+  myPID3.SetOutputLimits(outMin3_1, outMax3_1);
+  myPID3.SetMode(AUTOMATIC);  
+  myPID3.Compute();
+  }
+
+  if(Direction3==1){//REVERSE 
+  myPID3.SetOutputLimits(outMin3_1, outMax3_1);
+  myPID3.SetMode(AUTOMATIC);  
+  myPID3.Compute();
+  }
+
   PIDOutput3 = int(Output3);
   if (PIDOutput3<=outMin3_1){PIDOutput3=outMin3_1;}  // Set minimum
   if (PIDOutput3>=outMax3_1){PIDOutput3=outMax3_1;}  // Set maximum
   AOut(3,PIDOutput3);
-  Serial.print("Input3 ");
+  
+  /*Serial.print("   Input3  ");
   Serial.print(Input3);
-  Serial.print("   Setpoint3 ");
+  Serial.print("   Setpoint3  ");
   Serial.print(Setpoint3);
+  Serial.print("   kp3  ");
+  Serial.print(kp3);
+  Serial.print("   ki3  ");
+  Serial.print(ki3);
+  Serial.print("   kd3  ");
+  Serial.print(kd3);
+  Serial.print("   Output3  ");
+  Serial.print(Output3);
   Serial.print("   PIDOutput3 ");
-  Serial.println(PIDOutput3);
+  Serial.println(PIDOutput3);*/
 }
 
-void PIDAOut4(int setpoint4_1,float Feedback4_1,int kp4_1,int ki4_1,int kd4_1,int outMin4_1,int outMax4_1){
+void PIDAOut4(int setpoint4_1,float Feedback4_1,int Direction4,int kp4_1,int ki4_1,int kd4_1,int outMin4_1,int outMax4_1){
   Input4 = Feedback4_1;      // Feedback
   Setpoint4 = setpoint4_1*0.1; // Set point 
-  myPID4.SetOutputLimits(outMin4_1, outMax4_1);
-  myPID4.SetMode(AUTOMATIC);  
-  myPID4.Compute();
+  kp4_1 = map(kp4_1,0,100,0,15);
+  ki4_1 = map(ki4_1,0,100,0,10);
+  kd4_1 = map(kd4_1,0,100,0,3);
   kp4 = kp4_1;
   ki4 = ki4_1;
   kd4 = kd4_1;
+
+  PID myPID4(&Input4, &Output4, &Setpoint4, kp4, ki4, kd4, DIRECT);
+  PID myPID4R(&Input4, &Output4, &Setpoint4, kp4, ki4, kd4, REVERSE);
+
+  if(Direction4==0){//DIRECT 
+  myPID4.SetOutputLimits(outMin4_1, outMax4_1);
+  myPID4.SetMode(AUTOMATIC);  
+  myPID4.Compute();
+  }
+
+  if(Direction4==1){//REVERSE 
+  myPID4R.SetOutputLimits(outMin4_1, outMax4_1);
+  myPID4R.SetMode(AUTOMATIC);  
+  myPID4R.Compute();
+  }
+
   PIDOutput4 = int(Output4);
   if (PIDOutput4<=outMin4_1){PIDOutput4=outMin4_1;}  // Set minimum
   if (PIDOutput4>=outMax4_1){PIDOutput4=outMax4_1;}  // Set maximum
   AOut(4,PIDOutput4);
-  Serial.print("Input4 ");
+
+  /*Serial.print("   Input4  ");
   Serial.print(Input4);
-  Serial.print("   Setpoint4 ");
+  Serial.print("   Setpoint4  ");
   Serial.print(Setpoint4);
+  Serial.print("   kp4  ");
+  Serial.print(kp4);
+  Serial.print("   ki4  ");
+  Serial.print(ki4);
+  Serial.print("   kd4  ");
+  Serial.print(kd4);
+  Serial.print("   Output4  ");
+  Serial.print(Output4);
   Serial.print("   PIDOutput4 ");
-  Serial.println(PIDOutput4);
+  Serial.println(PIDOutput4);*/
 }
 
 
