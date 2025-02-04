@@ -114,29 +114,42 @@
   ps46           109          
   
 
-  DOut(channel,output)
-  chennel =>select chennel 1-4
+  DOut(channel,output)  
+  chennel =>select chennel 1-8
   output => 0,1
+  ex. DOut(1,DI1);
+
   
-  AISet(channel,input,min,max)
+  AISet(channel,m,c,Min,Max,CalAI )
+  by linear equations (y=mx+c) 
   chennel =>select chennel 1-4
-  input =>sensor type  1=0-5VDC , 2=4-20mA 
+  m => m in Equation y=mx+c
+  c => c in Equation y=mx+c
   min => minimum value of sensor range
   max => maximum value of sensor range  
+  CalAI => Calibration by multiplier Such as 1.234
+  ex. AISet(2,0.5859,-120.12,0,450,1);
 
   AOut(channel,output)
   chennel =>select chennel 1-4
   output => 0-10VDC 
-   
-   PIDAOut1(setpoint,input,kP,kI,kD,min,max)
-   setpoint => setpoint value for pid control
-   input => input feedback for pid control
-   direction => pid control type 0 = Forward , 1 = Backward 
-   kP = > propotional constant value (0-100%)
-   kI = > integral constant value (0-100%)
-   kD = > differential constant value (0-100%)
-   min => minimum value of pid output 
-   max => maximum value of pid output   */
+  ex. AOut(1,100);
 
+  PIDAOut1(setpoint,input,direction,kP,kI,kD,min,max)
+  setpoint => setpoint value for pid control
+  input => input feedback for pid control
+  direction => pid control type 0 = Forward , 1 = Backward 
+  kP = > propotional constant value (0-100%)
+  kI = > integral constant value (0-100%)
+  kD = > differential constant value (0-100%)
+  min => minimum value of pid output 
+  max => maximum value of pid output   
    
-*/
+   
+  PIDAOut1(3000,AI2,0,100,50,25,30,100); //70,50,25,
+  PIDAOut2(3000,AI2,0,100,50,25,30,100);
+  PIDAOut3(500,AI2,0,100,50,25,30,100);
+  PIDAOut4(500,AI2,0,100,50,25,30,100);
+    */
+   
+   
