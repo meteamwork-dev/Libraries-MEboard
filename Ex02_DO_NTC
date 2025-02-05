@@ -1,0 +1,33 @@
+#include "MEBoard.h"
+//Example02 สั่งเปิด-ปิดรีเลย์แชแนลที่ 1 ด้วยอุณหภูมิ NTC แชแนลที่ 1
+void setup() {
+  pinmode(); //ประกาศขาที่จำเป็นต่อใช้งานของ MEBoard
+  TimeSensor.setInterval(3000,ReadSensor);  //ความเร็วในการวนอ่านค่าเซ็นเซอร์ ตั้งค่าไว้ 3000 = 3Sec 
+  Serial.begin(19200);  //เพื่อดูค่าใน Serial Monitor โดย baud-rate 19200
+  slave.begin(9600); //สื่อสาร RS485 ช่องที่ 1 เลือก baud rate 9600  
+  slave2.begin(9600); //สื่อสาร RS485 ช่องที่ 2 เลือก baud rate 9600  
+}
+
+void ReadSensor(){
+  ReadAI(); //อ่านค่า Analoginput และ NTC
+/////////////forAIset///////////////////////
+
+//////////////////////////////////////////
+}
+
+void loop() {
+   TimeSensor.run(); //เปิดใช้งานฟังก์ชั่นเวลา
+   ReadDI(); //อ่านค่า DI ทุกแชแนลของ MEBoard
+   modbusread(); //อ่านค่าจาก RS485
+   Eeprom(); //จดจำค่าตัวแปรเมื่อบอร์ดไม่มีไฟเลี้ยง
+ /////////////programing here//////////////////
+   Serial.println(NTC1); //แสดงค่า NTC แชแนลที่ 1 ใน serial monitor
+   if(NTC1 <= 35){ //ถ้าค่าอุณหภูมิ NTC1 น้อยกว่าหรือเท่ากับ 35 
+      DOut(1,0); //สั่งรีเลย์ Digitaloutput แชแนลที่1 ไม่ทำงาน
+   } 
+   if(NTC1 > 35){ //ถ้าค่าอุณหภูมิ NTC1 มากกว่า 35 
+      DOut(1,1); //สั่งรีเลย์ Digitaloutput แชแนลที่1 ทำงาน
+   }
+ /////////////////////////////////////////////  
+   Register(); //ประกาศตำแหน่ง RS485 แต่ละตัวแปร
+}
