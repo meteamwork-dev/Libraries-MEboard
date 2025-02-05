@@ -1,0 +1,35 @@
+#include "MEBoard.h"
+//Example01 สั่งเปิด-ปิดรีเลย์ แต่ละแชแนลด้วย Digitalinput
+
+void setup() {
+  pinmode(); //ประกาศขาที่จำเป็นต่อใช้งานของ MEBoard
+  TimeSensor.setInterval(3000,ReadSensor);  //ความเร็วในการวนอ่านค่าเซ็นเซอร์ ตั้งค่าไว้ 3000 = 3Sec 
+  Serial.begin(19200);  //เพื่อดูค่าใน Serial Monitor โดย baud-rate 19200
+  slave.begin(9600); //สื่อสาร RS485 ช่องที่ 1 เลือก baud rate 9600   
+  slave2.begin(9600); //สื่อสาร RS485 ช่องที่ 2 เลือก baud rate 9600 
+}
+
+void ReadSensor(){
+  ReadAI(); //อ่านค่า Analoginput
+/////////////สำหรับAIset///////////////////
+
+//////////////////////////////////////////
+}
+
+void loop() {
+   TimeSensor.run(); //เปิดใช้งานฟังก์ชั่นเวลา
+   ReadDI(); //อ่านค่า DI ทุกแชแนลของ MEBoard 
+   modbusread(); //อ่านค่าจาก RS485
+   Eeprom(); //จดจำค่าตัวแปรเมื่อบอร์ดไม่มีไฟเลี้ยง
+ /////////////programing here//////////////////
+    DOut(1,DI1); //สั่งรีเลย์ Digitaloutput แชแนลที่1 ทำงาน
+    DOut(2,DI2); //สั่งรีเลย์ Digitaloutput แชแนลที่2 ทำงาน
+    DOut(3,DI3); //สั่งรีเลย์ Digitaloutput แชแนลที่3 ทำงาน
+    DOut(4,DI4); //สั่งรีเลย์ Digitaloutput แชแนลที่4 ทำงาน
+    DOut(5,DI5); //สั่งรีเลย์ Digitaloutput แชแนลที่5 ทำงาน
+    DOut(6,DI6); //สั่งรีเลย์ Digitaloutput แชแนลที่6 ทำงาน
+    DOut(7,DI7); //สั่งรีเลย์ Digitaloutput แชแนลที่7 ทำงาน
+    DOut(8,DI8); //สั่งรีเลย์ Digitaloutput แชแนลที่8 ทำงาน
+ /////////////////////////////////////////////  
+  Register(); //ประกาศตำแหน่ง RS485 แต่ละตัวแปร
+}
