@@ -22,7 +22,7 @@ void loop() {
    modbusread(); //อ่านค่าจาก RS485
    Eeprom(); //จดจำค่าตัวแปรเมื่อบอร์ดไม่มีไฟเลี้ยง
  /////////////programing here//////////////////
-   Serial.println(AI1); แสดงค่า AI1 แชแนลที่ 1 ใน serial monitor
+   Serial.println(AI1); //แสดงค่า AI1 แชแนลที่ 1 ใน serial monitor
    if(AI1 <= 33){ //ถ้าค่าอุณหภูมิ AI1 น้อยกว่าหรือเท่ากับ 33
       DOut(1,0); //สั่งรีเลย์ Digitaloutput แชแนลที่1 ไม่ทำงาน
    }
