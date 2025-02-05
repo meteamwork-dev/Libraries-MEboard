@@ -10,7 +10,7 @@ void setup() {
 }
 
 void ReadSensor(){
-  ReadAI(); //อ่านค่า Analoginput
+  ReadAI(); //อ่านค่า Analoginput และ NTC
 /////////////สำหรับAIset///////////////////
 
 //////////////////////////////////////////
