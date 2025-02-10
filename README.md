@@ -18,9 +18,9 @@
 ## อธิบายฟังก์ชันและการใช้งานของไลบราลี่ MEboard
 ติดตั้ง Arduino IDE version : 2.3.4 
 
-ดาวโหลดไฟล์ไลบราลี่จาก https://github.com/meteamwork-dev/Libraries-MEboard
+ดาวโหลดไฟล์ external libraries.rar ไลบราลี่จาก https://github.com/meteamwork-dev/Libraries-MEboard
 
-และติดตั้ง ลงไปใน C:\Program Files (x86)\Arduino\libraries
+และติดตั้งเพียงไฟล์ด้านใน external libraries.rar ลงไปใน C:\Program Files (x86)\Arduino\libraries
 สามารถเขียนโปรแกรมจากไฟล์ "MEboard.ino" ซึ่งเป็นไฟล์ที่ได้เขียนอ่านค่าเซ็นเซอร์ต่างๆไว้แล้วตามตัวอย่างที่  หรือ สามารถเปิดไฟล์ Arduino ใหม่ แล้วให้พิม
 
                   #include "MEBoard.h"       ---1.1
